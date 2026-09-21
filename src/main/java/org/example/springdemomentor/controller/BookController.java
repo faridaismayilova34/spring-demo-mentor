@@ -1,8 +1,8 @@
 package org.example.springdemomentor.controller;
 
+import org.example.springdemomentor.entity.BookEntity;
 import org.example.springdemomentor.exception.BookNotFoundException;
 import org.example.springdemomentor.exception.InvalidBookDataException;
-import org.example.springdemomentor.model.Book;
 import org.example.springdemomentor.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,15 +24,15 @@ public class BookController {
 
     // 1. GET /api/books
     @GetMapping
-    public ResponseEntity<List<Book>> getAllBooks() {
+    public ResponseEntity<List<BookEntity>> getAllBooks() {
         return ResponseEntity.ok(bookService.getAllBooks());
     }
 
     // 2. GET /api/books/{id}
     @GetMapping("/{id}")
-    public ResponseEntity<?> getBookById(@PathVariable Long id) {
+    public ResponseEntity<?> getBookById(@PathVariable Integer id) {
         try {
-            Book book = bookService.getBookById(id);
+            BookEntity book = bookService.getBookById(id);
             return ResponseEntity.ok(book);
         } catch (BookNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -41,26 +41,25 @@ public class BookController {
 
     // 3. GET /api/books/search?genre=...
     @GetMapping("/search")
-    public ResponseEntity<List<Book>> searchBooks(@RequestParam(required = false) String genre) {
+    public ResponseEntity<List<BookEntity>> searchByGenre(@RequestParam String genre) {
         return ResponseEntity.ok(bookService.searchByGenre(genre));
     }
 
     // 4. POST /api/books
     @PostMapping
-    public ResponseEntity<?> createBook(@RequestBody Book book) {
+    public ResponseEntity<?> createBook(@RequestBody BookEntity book) {
         try {
-            Book savedBook = bookService.addBook(book);
+            BookEntity savedBook = bookService.addBook(book);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedBook);
         } catch (InvalidBookDataException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
-
     // 5. PUT /api/books/{id}
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateBook(@PathVariable Long id, @RequestBody Book book) {
+    public ResponseEntity<?> updateBook(@PathVariable Integer id, @RequestBody BookEntity book) {
         try {
-            Book updatedBook = bookService.updateBook(id, book);
+            BookEntity updatedBook = bookService.updateBook(id, book);
             return ResponseEntity.ok(updatedBook);
         } catch (BookNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -71,7 +70,7 @@ public class BookController {
 
     // 6. DELETE /api/books/{id}
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBook(@PathVariable Long id) {
+    public ResponseEntity<?> deleteBook(@PathVariable Integer id) {
         try {
             bookService.deleteBook(id);
             return ResponseEntity.noContent().build(); // 204 No Content
